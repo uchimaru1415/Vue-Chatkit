@@ -33,5 +33,30 @@ export default {
     } finally {
       commit('setLoading', false)
     }
+  },
+  async changeRoom ({ commit }, roomId) {
+    try {
+      const { id, name } = await chatkit.subscribeToRoom(roomId)
+      commit('setActiveRoom', { id, name })
+    } catch (error) {
+      handleError(commit, error)
+    }
+  },
+  async sendMessage ({ commit }, message) {
+    try {
+      commit('setError', '')
+      commit('setSending', true)
+      const messageId = await chatkit.sendMessage(message)
+      return messageId
+    } catch (error) {
+      handleError(commit, error)
+    } finally {
+      commit('setSendigng', false)
+    }
+  },
+  async logout ({ commit }) {
+    commit('reset')
+    chatkit.disconnectUser()
+    window.localStorage.clear()
   }
 }
